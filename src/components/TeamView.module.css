@@ -1,0 +1,197 @@
+.container {
+  padding: 32px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.teamName {
+  font-family: var(--font-display);
+  font-size: 32px;
+  letter-spacing: 2px;
+  color: var(--text-primary);
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.teamMeta {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.teamCodeBadge {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--gold);
+  background: rgba(245, 158, 11, 0.15);
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.groupBadge {
+  font-size: 11px;
+  color: var(--text-muted);
+  background: var(--bg-hover);
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.progress {
+  font-family: var(--font-display);
+  font-size: 22px;
+  color: var(--green);
+  letter-spacing: 1px;
+}
+
+.actionBtn {
+  padding: 7px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  transition: all var(--transition);
+}
+
+.actionBtn:hover {
+  border-color: var(--border-light);
+  color: var(--text-primary);
+}
+
+.actionBtnDanger:hover {
+  border-color: var(--red-dim);
+  color: var(--red);
+}
+
+.legend {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.legendItem {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.legendMissing { color: var(--text-muted); }
+.legendOwned { color: var(--green); }
+.legendDup { color: var(--yellow); }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.card {
+  aspect-ratio: 3/4;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--border);
+  background: var(--bg-card);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition);
+  position: relative;
+  user-select: none;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-light);
+}
+
+.missing {
+  opacity: 0.45;
+}
+
+.missing:hover {
+  opacity: 0.7;
+}
+
+.owned {
+  border-color: var(--green-dim);
+  background: var(--green-bg);
+}
+
+.owned:hover {
+  border-color: var(--green);
+}
+
+.duplicate {
+  border-color: var(--yellow-dim);
+  background: var(--yellow-bg);
+}
+
+.duplicate:hover {
+  border-color: var(--yellow);
+}
+
+.cardNumber {
+  font-size: 11px;
+  color: var(--text-muted);
+  position: absolute;
+  top: 8px;
+  left: 10px;
+  font-weight: 600;
+}
+
+.cardId {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+}
+
+.owned .cardId { color: var(--green); }
+.duplicate .cardId { color: var(--yellow); }
+
+.dupBadge {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  background: var(--yellow-dim);
+  color: #000;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 5px;
+  border-radius: 3px;
+  cursor: pointer;
+  min-width: 20px;
+  text-align: center;
+}
+
+.dupInput {
+  width: 36px;
+  background: transparent;
+  border: none;
+  color: #000;
+  font-size: 10px;
+  font-weight: 700;
+  text-align: center;
+  outline: none;
+}
+
+.tip {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: center;
+  padding-top: 8px;
+}
