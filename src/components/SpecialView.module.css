@@ -1,0 +1,126 @@
+.container {
+  padding: 32px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 28px;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 30px;
+  letter-spacing: 3px;
+  color: var(--gold);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.count {
+  font-family: var(--font-display);
+  font-size: 22px;
+  color: var(--gold);
+  letter-spacing: 1px;
+}
+
+.btn {
+  padding: 7px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  transition: all var(--transition);
+}
+
+.btn:hover {
+  border-color: var(--border-light);
+  color: var(--text-primary);
+}
+
+.btnDanger:hover {
+  border-color: var(--red-dim);
+  color: var(--red);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+}
+
+.card {
+  aspect-ratio: 3/4;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--border);
+  background: var(--bg-card);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition);
+  gap: 6px;
+  user-select: none;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+}
+
+.missing {
+  opacity: 0.4;
+}
+
+.owned {
+  border-color: var(--gold);
+  background: rgba(245, 158, 11, 0.08);
+}
+
+.duplicate {
+  border-color: var(--yellow-dim);
+  background: var(--yellow-bg);
+}
+
+.starIcon {
+  font-size: 18px;
+  color: var(--text-muted);
+}
+
+.owned .starIcon { color: var(--gold); }
+.duplicate .starIcon { color: var(--yellow); }
+
+.cardId {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+}
+
+.owned .cardId { color: var(--gold-light); }
+.duplicate .cardId { color: var(--yellow); }
+
+.statusLabel {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.owned .statusLabel { color: var(--gold); }
+.duplicate .statusLabel { color: var(--yellow); }
