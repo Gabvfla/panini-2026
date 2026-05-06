@@ -1,0 +1,42 @@
+.layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg-base);
+}
+
+.main {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.content {
+  min-height: 100%;
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  gap: 16px;
+  background: var(--bg-base);
+}
+
+.loadingIcon {
+  font-size: 48px;
+  animation: spin 1.5s linear infinite;
+}
+
+.loadingText {
+  font-size: 14px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
