@@ -1,6 +1,6 @@
 .sidebar {
-  width: 220px;
-  min-width: 220px;
+  width: 230px;
+  min-width: 230px;
   height: 100%;
   background: var(--bg-surface);
   border-right: 1px solid var(--border);
@@ -13,47 +13,103 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 20px 16px 16px;
+  padding: 18px 16px 14px;
   border-bottom: 1px solid var(--border);
+  background: linear-gradient(135deg, rgba(245,158,11,0.05) 0%, transparent 60%);
 }
 
 .logoIcon {
-  font-size: 24px;
+  font-size: 26px;
+  filter: drop-shadow(0 0 8px rgba(245,158,11,0.4));
 }
 
 .logoTitle {
   font-family: var(--font-display);
-  font-size: 20px;
-  letter-spacing: 2px;
+  font-size: 22px;
+  letter-spacing: 3px;
   color: var(--gold);
   line-height: 1;
+  text-shadow: 0 0 20px var(--gold-glow);
 }
 
 .logoSub {
-  font-size: 11px;
+  font-size: 10px;
   color: var(--text-muted);
-  letter-spacing: 1px;
-  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 1px;
 }
 
-.section {
-  padding: 12px 8px 8px;
+.globalProgress {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.globalProgressHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.globalProgressLabel {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.globalProgressPct {
+  font-family: var(--font-display);
+  font-size: 16px;
+  color: var(--green);
+  letter-spacing: 1px;
+}
+
+.globalProgressTrack {
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.globalProgressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--green-dim), var(--green));
+  border-radius: 2px;
+  transition: width 0.5s ease;
+  box-shadow: 0 0 6px var(--green-glow);
+}
+
+.globalStats {
+  display: flex;
+  gap: 8px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.statGreen { color: var(--green); }
+.statRed { color: var(--red); }
+.statYellow { color: var(--yellow); }
+
+.navSection {
+  padding: 10px 8px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
 }
 
 .navItem {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 9px;
   padding: 8px 10px;
   border-radius: var(--radius-sm);
   color: var(--text-secondary);
   font-size: 13px;
   font-weight: 500;
   transition: all var(--transition);
-  text-align: left;
   width: 100%;
 }
 
@@ -62,92 +118,106 @@
   color: var(--text-primary);
 }
 
-.navItem.active {
-  background: var(--blue-bg);
-  color: var(--blue);
+.navActive {
+  background: var(--gold-bg) !important;
+  color: var(--gold) !important;
+  box-shadow: inset 0 0 0 1px rgba(245,158,11,0.2);
 }
 
 .navIcon {
-  font-size: 15px;
-  width: 18px;
+  font-size: 14px;
+  width: 16px;
   text-align: center;
 }
 
-.groupsLabel {
-  padding: 8px 16px 4px;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 1.5px;
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 0;
+}
+
+.groupsHeader {
+  padding: 10px 16px 4px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
   color: var(--text-muted);
   text-transform: uppercase;
-  border-top: 1px solid var(--border);
 }
 
 .groupsList {
   flex: 1;
   overflow-y: auto;
-  padding: 4px 8px 16px;
+  padding: 2px 8px 16px;
 }
 
-.groupItem {
-  margin-bottom: 4px;
+.groupBlock {
+  margin-bottom: 2px;
 }
 
-.groupHeader {
-  padding: 6px 6px 2px;
-}
-
-.groupBadge {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 1px;
-  color: var(--text-muted);
+.groupLabel {
+  padding: 6px 8px 3px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
   text-transform: uppercase;
+  color: var(--text-muted);
 }
 
-.teamItem {
+.teamBtn {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
   padding: 5px 8px;
   border-radius: var(--radius-sm);
   width: 100%;
-  text-align: left;
   transition: all var(--transition);
   color: var(--text-secondary);
 }
 
-.teamItem:hover {
+.teamBtn:hover {
   background: var(--bg-hover);
   color: var(--text-primary);
 }
 
-.teamItem.activeTeam {
+.teamActive {
   background: var(--bg-hover);
   color: var(--text-primary);
+  box-shadow: inset 2px 0 0 var(--team-color, var(--gold));
 }
 
-.teamCode {
-  font-size: 11px;
-  font-weight: 600;
-  width: 32px;
-  color: inherit;
-  letter-spacing: 0.5px;
+.teamFlag {
+  font-size: 16px;
+  line-height: 1;
+  flex-shrink: 0;
 }
 
-.teamProgress {
+.teamInfo {
   flex: 1;
-  height: 3px;
+  min-width: 0;
+}
+
+.teamName {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: inherit;
+  line-height: 1;
+  margin-bottom: 3px;
+}
+
+.teamBar {
+  height: 2px;
   background: var(--border);
-  border-radius: 2px;
+  border-radius: 1px;
   overflow: hidden;
 }
 
-.teamProgressBar {
+.teamBarFill {
   height: 100%;
-  background: var(--green);
-  border-radius: 2px;
-  transition: width 0.3s ease;
+  border-radius: 1px;
+  transition: width 0.4s ease;
+  opacity: 0.8;
 }
 
 .teamCount {
@@ -155,4 +225,5 @@
   color: var(--text-muted);
   min-width: 28px;
   text-align: right;
+  flex-shrink: 0;
 }

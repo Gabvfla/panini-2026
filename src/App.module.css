@@ -9,6 +9,7 @@
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
+  background: var(--bg-base);
 }
 
 .content {
@@ -26,14 +27,15 @@
 }
 
 .loadingIcon {
-  font-size: 48px;
-  animation: spin 1.5s linear infinite;
+  font-size: 52px;
+  animation: spin 1.8s linear infinite;
 }
 
 .loadingText {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text-muted);
-  letter-spacing: 1px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
 }
 
 @keyframes spin {

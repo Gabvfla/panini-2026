@@ -1,14 +1,13 @@
 import { useAlbumStore } from '../store/albumStore'
 import { GROUPS, SPECIAL_STICKERS } from '../data/album'
+import { Flag } from './Flag'
 import styles from './MissingView.module.css'
 
 export function MissingView() {
   const stickers = useAlbumStore((s) => s.stickers)
   const setStatus = useAlbumStore((s) => s.setStatus)
 
-  const missingSpecial = SPECIAL_STICKERS.filter(
-    (id) => stickers[id]?.status === 'missing'
-  )
+  const missingSpecial = SPECIAL_STICKERS.filter((id) => stickers[id]?.status === 'missing')
 
   const missingByTeam = GROUPS.flatMap((group) =>
     group.teams.map((team) => {
@@ -19,56 +18,57 @@ export function MissingView() {
     })
   ).filter((t) => t.missing.length > 0)
 
-  const totalMissing =
-    missingSpecial.length + missingByTeam.reduce((acc, t) => acc + t.missing.length, 0)
+  const totalMissing = missingSpecial.length + missingByTeam.reduce((acc, t) => acc + t.missing.length, 0)
 
   return (
     <div className={styles.container}>
       <div className={styles.header}>
+        <div className={styles.headerIcon}>📋</div>
         <div>
-          <h1 className={styles.title}>FIGURINHAS FALTANDO</h1>
-          <p className={styles.subtitle}>{totalMissing} figurinhas para completar o álbum</p>
+          <h1 className={styles.title}>FALTANDO</h1>
+          <p className={styles.subtitle}>
+            {totalMissing === 0 ? 'Álbum completo! 🏆' : `${totalMissing} figurinhas para completar`}
+          </p>
         </div>
       </div>
 
       {totalMissing === 0 && (
         <div className={styles.empty}>
-          <div className={styles.emptyIcon}>🏆</div>
-          <div className={styles.emptyTitle}>Álbum Completo!</div>
-          <div className={styles.emptyText}>Parabéns, você tem todas as figurinhas.</div>
+          <div className={styles.emptyTrophy}>🏆</div>
+          <div className={styles.emptyTitle}>PARABÉNS!</div>
+          <div className={styles.emptyText}>Você completou o álbum da Copa 2026.</div>
         </div>
       )}
 
       {missingSpecial.length > 0 && (
         <div className={styles.section}>
           <div className={styles.sectionHeader}>
-            <span className={styles.sectionTitle}>★ Especiais</span>
-            <span className={styles.sectionCount}>{missingSpecial.length} faltando</span>
+            <div className={styles.sectionLeft}>
+              <span className={styles.sectionIcon}>★</span>
+              <span className={styles.sectionTitle}>Especiais</span>
+            </div>
+            <span className={styles.sectionBadge}>{missingSpecial.length}</span>
           </div>
           <div className={styles.chips}>
             {missingSpecial.map((id) => (
-              <button
-                key={id}
-                className={`${styles.chip} ${styles.chipSpecial}`}
-                onClick={() => setStatus(id, 'owned')}
-                title="Clique para marcar como obtida"
-              >
-                {id}
+              <button key={id} className={`${styles.chip} ${styles.chipSpecial}`} onClick={() => setStatus(id, 'owned')}>
+                <span className={styles.chipId}>{id}</span>
+                <span className={styles.chipPlus}>+</span>
               </button>
             ))}
           </div>
         </div>
       )}
 
-      {missingByTeam.map(({ team, group, missing }) => (
+      {missingByTeam.map(({ team, missing }) => (
         <div key={team.code} className={styles.section}>
           <div className={styles.sectionHeader}>
-            <div className={styles.sectionTitleGroup}>
+            <div className={styles.sectionLeft}>
+              <Flag iso={team.iso} size="sm" />
               <span className={styles.sectionTitle}>{team.name}</span>
-              <span className={styles.teamCodeTag}>{team.code}</span>
-              <span className={styles.groupTag}>Grupo {group}</span>
+              <span className={styles.sectionCode} style={{ color: team.color }}>{team.code}</span>
             </div>
-            <span className={styles.sectionCount}>{missing.length} faltando</span>
+            <span className={styles.sectionBadge}>{missing.length}</span>
           </div>
           <div className={styles.chips}>
             {missing.map((id) => (
@@ -76,9 +76,10 @@ export function MissingView() {
                 key={id}
                 className={styles.chip}
                 onClick={() => setStatus(id, 'owned')}
-                title="Clique para marcar como obtida"
+                style={{ '--chip-color': team.color } as React.CSSProperties}
               >
-                {id}
+                <span className={styles.chipId}>{id}</span>
+                <span className={styles.chipPlus}>+</span>
               </button>
             ))}
           </div>

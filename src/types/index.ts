@@ -10,6 +10,8 @@ export interface Team {
   code: string
   name: string
   group: string
+  iso: string
+  color: string
 }
 
 export interface Group {

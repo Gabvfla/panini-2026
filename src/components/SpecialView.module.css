@@ -1,55 +1,91 @@
 .container {
-  padding: 32px;
+  padding: 28px 32px 40px;
 }
 
 .header {
+  position: relative;
+  background: linear-gradient(135deg, rgba(245,158,11,0.08) 0%, rgba(251,191,36,0.03) 50%, transparent 100%);
+  border: 1px solid rgba(245,158,11,0.2);
+  border-radius: var(--radius-xl);
+  padding: 24px 28px;
+  margin-bottom: 24px;
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 28px;
+  overflow: hidden;
+}
+
+.headerGlow {
+  position: absolute;
+  top: -50px; left: -50px;
+  width: 200px; height: 200px;
+  background: radial-gradient(circle, rgba(245,158,11,0.1) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  position: relative;
+}
+
+.headerIcon {
+  font-size: 52px;
+  filter: drop-shadow(0 0 16px rgba(245,158,11,0.5));
 }
 
 .title {
   font-family: var(--font-display);
-  font-size: 30px;
-  letter-spacing: 3px;
-  color: var(--gold);
+  font-size: 38px;
+  letter-spacing: 4px;
+  background: linear-gradient(90deg, var(--gold), var(--gold-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   line-height: 1;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 .subtitle {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text-muted);
+  letter-spacing: 0.5px;
 }
 
 .headerRight {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 20px;
+  position: relative;
 }
 
-.count {
-  font-family: var(--font-display);
-  font-size: 22px;
-  color: var(--gold);
-  letter-spacing: 1px;
+.ringWrap svg {
+  width: 80px; height: 80px;
+  filter: drop-shadow(0 0 8px var(--gold-glow));
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .btn {
-  padding: 7px 14px;
+  padding: 8px 16px;
   border-radius: var(--radius-sm);
   font-size: 12px;
   font-weight: 600;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
+  background: var(--bg-hover);
+  border: 1px solid var(--border-light);
   color: var(--text-secondary);
   transition: all var(--transition);
+  white-space: nowrap;
 }
 
 .btn:hover {
-  border-color: var(--border-light);
-  color: var(--text-primary);
+  border-color: var(--gold);
+  color: var(--gold);
 }
 
 .btnDanger:hover {
@@ -60,13 +96,13 @@
 .grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 12px;
+  gap: 10px;
 }
 
 .card {
   aspect-ratio: 3/4;
   border-radius: var(--radius-md);
-  border: 2px solid var(--border);
+  border: 1px solid var(--border);
   background: var(--bg-card);
   display: flex;
   flex-direction: column;
@@ -74,53 +110,73 @@
   justify-content: center;
   cursor: pointer;
   transition: all var(--transition);
-  gap: 6px;
+  gap: 5px;
   user-select: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.cardShine {
+  position: absolute;
+  top: 0; left: -100%;
+  width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
+  transition: left 0.4s ease;
+  pointer-events: none;
+}
+
+.card:hover .cardShine {
+  left: 150%;
 }
 
 .card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: var(--shadow-md);
+  z-index: 1;
 }
 
-.missing {
-  opacity: 0.4;
-}
+.card_missing { opacity: 0.35; }
+.card_missing:hover { opacity: 0.6; }
 
-.owned {
+.card_owned {
   border-color: var(--gold);
-  background: rgba(245, 158, 11, 0.08);
+  background: var(--bg-card2);
+  box-shadow: 0 0 0 1px rgba(245,158,11,0.3), 0 0 20px rgba(245,158,11,0.08);
 }
 
-.duplicate {
+.card_duplicate {
   border-color: var(--yellow-dim);
-  background: var(--yellow-bg);
+  background: var(--bg-card2);
 }
 
-.starIcon {
-  font-size: 18px;
+.cardSpecial.card_owned {
+  box-shadow: 0 0 0 1px var(--gold), 0 0 30px rgba(245,158,11,0.15);
+}
+
+.cardStar {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.card_missing .cardStar { filter: grayscale(1) opacity(0.4); }
+
+.cardId {
+  font-family: var(--font-display);
+  font-size: 16px;
+  letter-spacing: 1px;
   color: var(--text-muted);
 }
 
-.owned .starIcon { color: var(--gold); }
-.duplicate .starIcon { color: var(--yellow); }
+.card_owned .cardId { color: var(--gold-light); }
+.card_duplicate .cardId { color: var(--yellow); }
 
-.cardId {
-  font-size: 14px;
+.cardStatus {
+  font-size: 9px;
   font-weight: 700;
   letter-spacing: 1px;
-  color: var(--text-secondary);
-}
-
-.owned .cardId { color: var(--gold-light); }
-.duplicate .cardId { color: var(--yellow); }
-
-.statusLabel {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
   text-transform: uppercase;
   color: var(--text-muted);
 }
 
-.owned .statusLabel { color: var(--gold); }
-.duplicate .statusLabel { color: var(--yellow); }
+.card_owned .cardStatus { color: var(--gold); }
+.card_duplicate .cardStatus { color: var(--yellow); }

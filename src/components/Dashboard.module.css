@@ -1,112 +1,169 @@
 .container {
-  padding: 32px;
-  max-width: 960px;
+  padding: 28px 32px 40px;
+  max-width: 1000px;
 }
 
-.header {
-  margin-bottom: 32px;
+.hero {
+  position: relative;
+  background: linear-gradient(135deg, rgba(245,158,11,0.06) 0%, rgba(34,197,94,0.04) 50%, transparent 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 32px 36px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
 }
 
-.title {
-  font-family: var(--font-display);
-  font-size: 36px;
-  letter-spacing: 3px;
+.heroGlow {
+  position: absolute;
+  top: -60px;
+  left: -60px;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(245,158,11,0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.heroContent {
+  flex: 1;
+}
+
+.heroEyebrow {
+  font-size: 11px;
   color: var(--gold);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.heroTitle {
+  font-family: var(--font-display);
+  font-size: 52px;
+  letter-spacing: 5px;
+  color: var(--text-primary);
   line-height: 1;
-  margin-bottom: 4px;
+  text-shadow: 0 0 40px rgba(255,255,255,0.05);
 }
 
-.subtitle {
-  color: var(--text-muted);
+.heroTitle2 {
+  font-family: var(--font-display);
+  font-size: 52px;
+  letter-spacing: 5px;
+  line-height: 1;
+  background: linear-gradient(90deg, var(--gold), var(--gold-light), var(--yellow));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: none;
+  margin-bottom: 10px;
+}
+
+.heroSub {
   font-size: 13px;
-  letter-spacing: 1px;
+  color: var(--text-secondary);
+  letter-spacing: 0.5px;
 }
 
-.statsGrid {
+.heroRing {
+  width: 120px;
+  height: 120px;
+  flex-shrink: 0;
+}
+
+.ringsvg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 12px var(--green-glow));
+}
+
+.statsRow {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 12px;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
 }
 
 .statCard {
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 20px;
+  border-radius: var(--radius-lg);
+  padding: 18px 16px;
   text-align: center;
-}
-
-.statValue {
-  font-family: var(--font-display);
-  font-size: 40px;
-  letter-spacing: 1px;
-  line-height: 1;
-  margin-bottom: 6px;
-}
-
-.statLabel {
-  font-size: 11px;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  font-weight: 600;
-}
-
-.progressSection {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 16px 20px;
-  margin-bottom: 32px;
-}
-
-.progressHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-  font-size: 13px;
-  color: var(--text-secondary);
-}
-
-.progressPct {
-  font-family: var(--font-display);
-  font-size: 18px;
-  color: var(--green);
-  letter-spacing: 1px;
-}
-
-.progressTrack {
-  height: 8px;
-  background: var(--bg-base);
-  border-radius: 4px;
+  transition: all var(--transition);
+  position: relative;
   overflow: hidden;
 }
 
-.progressFill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--green-dim), var(--green));
-  border-radius: 4px;
-  transition: width 0.5s ease;
+.statCard::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
 }
 
-.groupsSection {
+.statTotal::before { background: linear-gradient(90deg, var(--blue-dim), var(--blue)); }
+.statOwned::before { background: linear-gradient(90deg, var(--green-dim), var(--green)); }
+.statMissing::before { background: linear-gradient(90deg, var(--red-dim), var(--red)); }
+.statDup::before { background: linear-gradient(90deg, var(--yellow-dim), var(--yellow)); }
+
+.statCard:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-light);
+  box-shadow: var(--shadow-md);
+}
+
+.statIcon {
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.statNum {
+  font-family: var(--font-display);
+  font-size: 38px;
+  letter-spacing: 1px;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.statTotal .statNum { color: var(--blue); }
+.statOwned .statNum { color: var(--green); }
+.statMissing .statNum { color: var(--red); }
+.statDup .statNum { color: var(--yellow); }
+
+.statLabel {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.section {
   margin-top: 8px;
 }
 
 .sectionTitle {
   font-family: var(--font-display);
-  font-size: 20px;
+  font-size: 22px;
   letter-spacing: 2px;
   color: var(--text-secondary);
   margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sectionTitleIcon {
+  font-size: 20px;
 }
 
 .groupsGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  gap: 10px;
 }
 
 .groupCard {
@@ -114,35 +171,44 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 14px 16px;
-  transition: border-color var(--transition);
+  transition: all var(--transition);
 }
 
 .groupCard:hover {
   border-color: var(--border-light);
+  background: var(--bg-card2);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
 }
 
-.groupCardHeader {
+.groupCardTop {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  justify-content: space-between;
+  margin-bottom: 10px;
 }
 
-.groupCardLabel {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  letter-spacing: 0.5px;
+.groupCardBadge {
+  font-family: var(--font-display);
+  font-size: 20px;
+  letter-spacing: 1px;
+  color: var(--gold);
 }
 
-.groupCardCount {
-  font-size: 12px;
-  color: var(--text-muted);
+.groupCardFlags {
+  display: flex;
+  gap: 4px;
+}
+
+.groupFlag {
+  font-size: 18px;
+  line-height: 1;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5));
 }
 
 .groupCardBar {
   height: 4px;
-  background: var(--bg-base);
+  background: var(--border);
   border-radius: 2px;
   overflow: hidden;
   margin-bottom: 10px;
@@ -150,23 +216,35 @@
 
 .groupCardFill {
   height: 100%;
-  background: var(--blue);
+  background: linear-gradient(90deg, var(--blue-dim), var(--blue));
   border-radius: 2px;
-  transition: width 0.4s ease;
+  transition: width 0.5s ease;
 }
 
-.groupTeams {
+.groupCardFooter {
   display: flex;
-  gap: 6px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.groupCardTeams {
+  display: flex;
+  gap: 4px;
   flex-wrap: wrap;
 }
 
 .groupTeamCode {
-  font-size: 10px;
-  font-weight: 600;
+  font-size: 9px;
+  font-weight: 700;
   color: var(--text-muted);
   letter-spacing: 0.5px;
   background: var(--bg-hover);
-  padding: 2px 6px;
+  padding: 2px 5px;
   border-radius: 3px;
+}
+
+.groupCardCount {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
 }

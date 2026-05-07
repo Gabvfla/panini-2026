@@ -1,0 +1,12 @@
+.flag {
+  display: inline-block;
+  object-fit: cover;
+  border-radius: 3px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.5);
+  flex-shrink: 0;
+}
+
+.sm  { width: 20px; height: 15px; border-radius: 2px; }
+.md  { width: 28px; height: 21px; }
+.lg  { width: 40px; height: 30px; border-radius: 4px; }
+.xl  { width: 64px; height: 48px; border-radius: 6px; box-shadow: 0 4px 16px rgba(0,0,0,0.6); }
