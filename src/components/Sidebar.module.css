@@ -239,3 +239,14 @@
   background: var(--blue-dim) !important;
   color: #fff !important;
 }
+
+.navBatch {
+  background: rgba(96,165,250,0.06) !important;
+  color: var(--blue) !important;
+  border: 1px solid rgba(96,165,250,0.15);
+}
+
+.navBatch:hover {
+  background: var(--blue-dim) !important;
+  color: #fff !important;
+}

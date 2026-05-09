@@ -7,9 +7,10 @@ interface SidebarProps {
   activeView: string
   onNavigate: (view: string) => void
   onExport: () => void
+  onBatch: () => void
 }
 
-export function Sidebar({ activeView, onNavigate, onExport }: SidebarProps) {
+export function Sidebar({ activeView, onNavigate, onExport, onBatch }: SidebarProps) {
   const stickers = useAlbumStore((s) => s.stickers)
   const getStats = useAlbumStore((s) => s.getStats)
   const stats = getStats()
@@ -55,11 +56,12 @@ export function Sidebar({ activeView, onNavigate, onExport }: SidebarProps) {
           { id: 'missing', icon: '◻', label: 'Faltando' },
           { id: 'duplicates', icon: '⧉', label: 'Repetidas' },
         { id: 'export', icon: '↑', label: 'Exportar' },
+        { id: 'batch', icon: '⚡', label: 'Entrada rápida' },
         ].map((item) => (
           <button
             key={item.id}
-            className={`${styles.navItem} ${item.id === 'export' ? styles.navExport : activeView === item.id ? styles.navActive : ''}`}
-            onClick={() => item.id === 'export' ? onExport() : onNavigate(item.id)}
+            className={`${styles.navItem} ${item.id === 'export' ? styles.navExport : item.id === 'batch' ? styles.navBatch : activeView === item.id ? styles.navActive : ''}`}
+            onClick={() => item.id === 'export' ? onExport() : item.id === 'batch' ? onBatch() : onNavigate(item.id)}
           >
             <span className={styles.navIcon}>{item.icon}</span>
             <span>{item.label}</span>

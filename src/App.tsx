@@ -7,6 +7,7 @@ import { SpecialView } from './components/SpecialView'
 import { MissingView } from './components/MissingView'
 import { DuplicatesView } from './components/DuplicatesView'
 import { ExportModal } from './components/ExportModal'
+import { BatchInput } from './components/BatchInput'
 import styles from './App.module.css'
 
 export default function App() {
@@ -14,6 +15,7 @@ export default function App() {
   const loaded = useAlbumStore((s) => s.loaded)
   const [activeView, setActiveView] = useState('dashboard')
   const [showExport, setShowExport] = useState(false)
+  const [showBatch, setShowBatch] = useState(false)
 
   useEffect(() => {
     load()
@@ -42,11 +44,12 @@ export default function App() {
 
   return (
     <div className={styles.layout}>
-      <Sidebar activeView={activeView} onNavigate={setActiveView} onExport={() => setShowExport(true)} />
+      <Sidebar activeView={activeView} onNavigate={setActiveView} onExport={() => setShowExport(true)} onBatch={() => setShowBatch(true)} />
       <main className={styles.main}>
         <div className={styles.content}>{renderContent()}</div>
       </main>
       {showExport && <ExportModal onClose={() => setShowExport(false)} />}
+      {showBatch && <BatchInput onClose={() => setShowBatch(false)} />}
     </div>
   )
 }
