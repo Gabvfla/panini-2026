@@ -227,3 +227,15 @@
   text-align: right;
   flex-shrink: 0;
 }
+
+.navExport {
+  background: var(--blue-bg) !important;
+  color: var(--blue) !important;
+  border: 1px solid rgba(59,130,246,0.2);
+  margin-top: 4px;
+}
+
+.navExport:hover {
+  background: var(--blue-dim) !important;
+  color: #fff !important;
+}

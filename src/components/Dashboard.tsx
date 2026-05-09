@@ -3,7 +3,8 @@ import { GROUPS } from '../data/album'
 import { Flag } from './Flag'
 import styles from './Dashboard.module.css'
 
-export function Dashboard() {
+interface DashboardProps { onExport: () => void }
+export function Dashboard({ onExport }: DashboardProps) {
   const stickers = useAlbumStore((s) => s.stickers)
   const getStats = useAlbumStore((s) => s.getStats)
   const stats = getStats()
@@ -31,6 +32,7 @@ export function Dashboard() {
           <h1 className={styles.heroTitle}>COPA DO MUNDO</h1>
           <h1 className={styles.heroTitle2}>2026</h1>
           <p className={styles.heroSub}>Controle sua coleção de figurinhas</p>
+          <button className={styles.exportBtn} onClick={onExport}>📤 Exportar álbum</button>
         </div>
         <div className={styles.heroRing}>
           <svg viewBox="0 0 120 120" className={styles.ringsvg}>

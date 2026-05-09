@@ -6,9 +6,10 @@ import styles from './Sidebar.module.css'
 interface SidebarProps {
   activeView: string
   onNavigate: (view: string) => void
+  onExport: () => void
 }
 
-export function Sidebar({ activeView, onNavigate }: SidebarProps) {
+export function Sidebar({ activeView, onNavigate, onExport }: SidebarProps) {
   const stickers = useAlbumStore((s) => s.stickers)
   const getStats = useAlbumStore((s) => s.getStats)
   const stats = getStats()
@@ -53,11 +54,12 @@ export function Sidebar({ activeView, onNavigate }: SidebarProps) {
           { id: 'special', icon: '★', label: 'Especiais' },
           { id: 'missing', icon: '◻', label: 'Faltando' },
           { id: 'duplicates', icon: '⧉', label: 'Repetidas' },
+        { id: 'export', icon: '↑', label: 'Exportar' },
         ].map((item) => (
           <button
             key={item.id}
-            className={`${styles.navItem} ${activeView === item.id ? styles.navActive : ''}`}
-            onClick={() => onNavigate(item.id)}
+            className={`${styles.navItem} ${item.id === 'export' ? styles.navExport : activeView === item.id ? styles.navActive : ''}`}
+            onClick={() => item.id === 'export' ? onExport() : onNavigate(item.id)}
           >
             <span className={styles.navIcon}>{item.icon}</span>
             <span>{item.label}</span>

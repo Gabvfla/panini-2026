@@ -6,12 +6,14 @@ import { TeamView } from './components/TeamView'
 import { SpecialView } from './components/SpecialView'
 import { MissingView } from './components/MissingView'
 import { DuplicatesView } from './components/DuplicatesView'
+import { ExportModal } from './components/ExportModal'
 import styles from './App.module.css'
 
 export default function App() {
   const load = useAlbumStore((s) => s.load)
   const loaded = useAlbumStore((s) => s.loaded)
   const [activeView, setActiveView] = useState('dashboard')
+  const [showExport, setShowExport] = useState(false)
 
   useEffect(() => {
     load()
@@ -27,7 +29,7 @@ export default function App() {
   }
 
   function renderContent() {
-    if (activeView === 'dashboard') return <Dashboard />
+    if (activeView === 'dashboard') return <Dashboard onExport={() => setShowExport(true)} />
     if (activeView === 'special') return <SpecialView />
     if (activeView === 'missing') return <MissingView />
     if (activeView === 'duplicates') return <DuplicatesView />
@@ -35,15 +37,16 @@ export default function App() {
       const code = activeView.replace('team-', '')
       return <TeamView teamCode={code} />
     }
-    return <Dashboard />
+    return <Dashboard onExport={() => setShowExport(true)} />
   }
 
   return (
     <div className={styles.layout}>
-      <Sidebar activeView={activeView} onNavigate={setActiveView} />
+      <Sidebar activeView={activeView} onNavigate={setActiveView} onExport={() => setShowExport(true)} />
       <main className={styles.main}>
         <div className={styles.content}>{renderContent()}</div>
       </main>
+      {showExport && <ExportModal onClose={() => setShowExport(false)} />}
     </div>
   )
 }
