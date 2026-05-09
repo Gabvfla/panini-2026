@@ -12,8 +12,8 @@ interface BatchInputProps {
 interface ParsedToken {
   id: string
   valid: boolean
+  count: number
   teamCode?: string
-  num?: number
 }
 
 const ALL_IDS_SET = new Set(ALL_STICKER_IDS)
@@ -21,23 +21,15 @@ const ALL_IDS_SET = new Set(ALL_STICKER_IDS)
 function parseInput(raw: string): ParsedToken[] {
   const normalized = raw.toUpperCase().replace(/[,;|\n\t]+/g, ' ').trim()
   const tokens = normalized.split(/\s+/).filter(Boolean)
-  const result: ParsedToken[] = []
-  const seen = new Set<string>()
+
+  const countMap = new Map<string, number>()
+  const orderMap = new Map<string, number>()
+  const invalidSet = new Set<string>()
 
   for (const token of tokens) {
-    if (seen.has(token)) continue
-    seen.add(token)
-
     if (ALL_IDS_SET.has(token)) {
-      const isSpecial = SPECIAL_STICKERS.includes(token)
-      if (isSpecial) {
-        result.push({ id: token, valid: true })
-      } else {
-        const match = token.match(/^([A-Z]+)(\d+)$/)
-        if (match) {
-          result.push({ id: token, valid: true, teamCode: match[1], num: parseInt(match[2]) })
-        }
-      }
+      countMap.set(token, (countMap.get(token) ?? 0) + 1)
+      if (!orderMap.has(token)) orderMap.set(token, orderMap.size)
       continue
     }
 
@@ -49,26 +41,40 @@ function parseInput(raw: string): ParsedToken[] {
       if (start <= end && end <= 20) {
         for (let i = start; i <= end; i++) {
           const id = `${code}${i}`
-          if (ALL_IDS_SET.has(id) && !seen.has(id)) {
-            seen.add(id)
-            result.push({ id, valid: true, teamCode: code, num: i })
+          if (ALL_IDS_SET.has(id)) {
+            countMap.set(id, (countMap.get(id) ?? 0) + 1)
+            if (!orderMap.has(id)) orderMap.set(id, orderMap.size)
           }
         }
         continue
       }
     }
 
-    result.push({ id: token, valid: false })
+    if (!invalidSet.has(token)) invalidSet.add(token)
+  }
+
+  const result: ParsedToken[] = []
+
+  const sorted = [...countMap.entries()].sort((a, b) => (orderMap.get(a[0]) ?? 0) - (orderMap.get(b[0]) ?? 0))
+  for (const [id, count] of sorted) {
+    const match = id.match(/^([A-Z]+)\d+$/)
+    result.push({ id, valid: true, count, teamCode: match ? match[1] : undefined })
+  }
+
+  for (const id of invalidSet) {
+    result.push({ id, valid: false, count: 0 })
   }
 
   return result
 }
 
 export function BatchInput({ onClose }: BatchInputProps) {
+  const setDuplicateCount = useAlbumStore((s) => s.setDuplicateCount)
+  const setStatus = useAlbumStore((s) => s.setStatus)
   const markAll = useAlbumStore((s) => s.markAll)
   const stickers = useAlbumStore((s) => s.stickers)
   const [inputValue, setInputValue] = useState('')
-  const [status, setStatus] = useState<StickerStatus>('owned')
+  const [status, setStatus2] = useState<StickerStatus>('owned')
   const [applied, setApplied] = useState(false)
   const [appliedCount, setAppliedCount] = useState(0)
   const inputRef = useRef<HTMLTextAreaElement>(null)
@@ -77,25 +83,33 @@ export function BatchInput({ onClose }: BatchInputProps) {
   const valid = parsed.filter((t) => t.valid)
   const invalid = parsed.filter((t) => !t.valid)
 
-  const alreadyOwned = valid.filter((t) => stickers[t.id]?.status === status)
-  const toApply = valid.filter((t) => stickers[t.id]?.status !== status)
+  const withDuplicates = valid.filter((t) => t.count > 1)
+  const singles = valid.filter((t) => t.count === 1)
 
   const handleApply = useCallback(() => {
-    if (toApply.length === 0) return
-    markAll(toApply.map((t) => t.id), status)
-    setAppliedCount(toApply.length)
+    if (valid.length === 0) return
+
+    for (const token of valid) {
+      if (token.count > 1) {
+        const existing = stickers[token.id]?.duplicateCount ?? 0
+        const newCount = existing > 0 ? existing + token.count : token.count
+        setDuplicateCount(token.id, newCount)
+      } else {
+        setStatus(token.id, status)
+      }
+    }
+
+    setAppliedCount(valid.length)
     setApplied(true)
     setInputValue('')
     setTimeout(() => setApplied(false), 2500)
-  }, [toApply, status, markAll])
+  }, [valid, status, stickers, setDuplicateCount, setStatus])
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-      handleApply()
-    }
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) handleApply()
   }
 
-  const examples = ['BRA1 BRA2 BRA3', 'ARG1-5', 'FWC1 FWC2 00', 'BRA1, ARG3, ESP7']
+  const examples = ['BRA1 BRA2 BRA3', 'ARG1-5', 'MEX13 MEX13', 'BRA1, BRA1, BRA1']
 
   return (
     <div className={styles.overlay} onClick={onClose}>
@@ -105,7 +119,7 @@ export function BatchInput({ onClose }: BatchInputProps) {
             <div className={styles.headerIcon}>⚡</div>
             <div>
               <h2 className={styles.title}>Entrada rápida</h2>
-              <p className={styles.subtitle}>Digite os códigos das figurinhas separados por espaço</p>
+              <p className={styles.subtitle}>Repita um código para contar repetidas automaticamente</p>
             </div>
           </div>
           <button className={styles.closeBtn} onClick={onClose}>✕</button>
@@ -117,19 +131,19 @@ export function BatchInput({ onClose }: BatchInputProps) {
             <div className={styles.statusBtns}>
               <button
                 className={`${styles.statusBtn} ${status === 'owned' ? styles.statusBtnOwned : ''}`}
-                onClick={() => setStatus('owned')}
+                onClick={() => setStatus2('owned')}
               >
                 ✓ Tenho
               </button>
               <button
                 className={`${styles.statusBtn} ${status === 'duplicate' ? styles.statusBtnDup : ''}`}
-                onClick={() => setStatus('duplicate')}
+                onClick={() => setStatus2('duplicate')}
               >
                 ⧉ Repetida
               </button>
               <button
                 className={`${styles.statusBtn} ${status === 'missing' ? styles.statusBtnMissing : ''}`}
-                onClick={() => setStatus('missing')}
+                onClick={() => setStatus2('missing')}
               >
                 ◻ Faltando
               </button>
@@ -140,7 +154,7 @@ export function BatchInput({ onClose }: BatchInputProps) {
             <textarea
               ref={inputRef}
               className={styles.textarea}
-              placeholder="Ex: BRA1 BRA2 ARG1-5 FWC1 ESP3..."
+              placeholder="Ex: MEX13 MEX13 BRA1 BRA2 ARG1-5..."
               value={inputValue}
               onChange={(e) => { setInputValue(e.target.value); setApplied(false) }}
               onKeyDown={handleKeyDown}
@@ -164,7 +178,9 @@ export function BatchInput({ onClose }: BatchInputProps) {
 
           <div className={styles.hint}>
             <span>Separe por espaço, vírgula ou quebra de linha.</span>
-            <span className={styles.hintRange}>Use intervalos: <code>BRA1-5</code> marca BRA1 até BRA5</span>
+            <span className={styles.hintRange}>
+              Repita um código para contar repetidas: <code>MEX13 MEX13</code> → 2 repetidas &nbsp;·&nbsp; Intervalos: <code>BRA1-5</code>
+            </span>
           </div>
 
           {parsed.length > 0 && (
@@ -172,29 +188,36 @@ export function BatchInput({ onClose }: BatchInputProps) {
               <div className={styles.previewHeader}>
                 <span className={styles.previewTitle}>Preview</span>
                 <div className={styles.previewCounts}>
-                  {valid.length > 0 && <span className={styles.countValid}>{valid.length} reconhecidas</span>}
-                  {invalid.length > 0 && <span className={styles.countInvalid}>{invalid.length} inválidas</span>}
-                  {alreadyOwned.length > 0 && <span className={styles.countSkip}>{alreadyOwned.length} já {status === 'owned' ? 'tenho' : status === 'duplicate' ? 'repetidas' : 'faltando'}</span>}
+                  {singles.length > 0 && <span className={styles.countValid}>{singles.length} figurinha{singles.length !== 1 ? 's' : ''}</span>}
+                  {withDuplicates.length > 0 && <span className={styles.countDup}>⧉ {withDuplicates.length} com repetidas</span>}
+                  {invalid.length > 0 && <span className={styles.countInvalid}>{invalid.length} inválida{invalid.length !== 1 ? 's' : ''}</span>}
                 </div>
               </div>
 
               {valid.length > 0 && (
                 <div className={styles.tokenGrid}>
                   {valid.map((t) => {
-                    const team = t.teamCode ? TEAM_MAP[t.teamCode] : null
-                    const isAlready = stickers[t.id]?.status === status
+                    const isSpecial = SPECIAL_STICKERS.includes(t.id)
+                    const team = !isSpecial && t.teamCode ? TEAM_MAP[t.teamCode] : null
+                    const isDup = t.count > 1
                     return (
                       <div
                         key={t.id}
-                        className={`${styles.token} ${isAlready ? styles.tokenSkip : styles.tokenValid}`}
+                        className={`${styles.token} ${isDup ? styles.tokenDup : styles.tokenValid}`}
                       >
                         {team && <Flag iso={team.iso} size="sm" />}
                         {!team && <span className={styles.tokenStar}>★</span>}
                         <span className={styles.tokenId}>{t.id}</span>
-                        {isAlready && <span className={styles.tokenCheck}>✓</span>}
+                        {isDup && <span className={styles.tokenBadge}>×{t.count}</span>}
                       </div>
                     )
                   })}
+                </div>
+              )}
+
+              {withDuplicates.length > 0 && (
+                <div className={styles.dupNote}>
+                  ⧉ Figurinhas repetidas {withDuplicates.length > 0 ? 'serão marcadas como repetida com a quantidade somada à existente' : ''}
                 </div>
               )}
 
@@ -213,7 +236,7 @@ export function BatchInput({ onClose }: BatchInputProps) {
         <div className={styles.footer}>
           {applied && (
             <div className={styles.successMsg}>
-              ✓ {appliedCount} figurinha{appliedCount !== 1 ? 's' : ''} marcada{appliedCount !== 1 ? 's' : ''}!
+              ✓ {appliedCount} figurinha{appliedCount !== 1 ? 's' : ''} aplicada{appliedCount !== 1 ? 's' : ''}!
             </div>
           )}
           <div className={styles.footerActions}>
@@ -222,11 +245,11 @@ export function BatchInput({ onClose }: BatchInputProps) {
             <button
               className={styles.applyBtn}
               onClick={handleApply}
-              disabled={toApply.length === 0}
+              disabled={valid.length === 0}
             >
-              {toApply.length === 0
+              {valid.length === 0
                 ? 'Nada para aplicar'
-                : `Aplicar ${toApply.length} figurinha${toApply.length !== 1 ? 's' : ''}`}
+                : `Aplicar ${valid.length} figurinha${valid.length !== 1 ? 's' : ''}`}
             </button>
           </div>
         </div>
