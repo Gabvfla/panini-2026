@@ -8,9 +8,11 @@ interface SidebarProps {
   onNavigate: (view: string) => void
   onExport: () => void
   onBatch: () => void
+  userEmail: string
+  onLogout: () => void
 }
 
-export function Sidebar({ activeView, onNavigate, onExport, onBatch }: SidebarProps) {
+export function Sidebar({ activeView, onNavigate, onExport, onBatch, userEmail, onLogout }: SidebarProps) {
   const stickers = useAlbumStore((s) => s.stickers)
   const getStats = useAlbumStore((s) => s.getStats)
   const stats = getStats()
@@ -100,6 +102,10 @@ export function Sidebar({ activeView, onNavigate, onExport, onBatch }: SidebarPr
             })}
           </div>
         ))}
+      </div>
+      <div className={styles.userBar}>
+        <div className={styles.userEmail}>{userEmail}</div>
+        <button className={styles.logoutBtn} onClick={onLogout} title="Sair">↩ Sair</button>
       </div>
     </nav>
   )

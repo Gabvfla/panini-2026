@@ -3,6 +3,7 @@ import { useAlbumStore } from '../store/albumStore'
 import { TEAM_MAP } from '../data/album'
 import { Flag } from './Flag'
 import type { StickerStatus } from '../types'
+import { useToken } from '../hooks/useToken'
 import styles from './TeamView.module.css'
 
 interface TeamViewProps {
@@ -17,6 +18,7 @@ function nextStatus(current: StickerStatus): StickerStatus {
 
 export function TeamView({ teamCode }: TeamViewProps) {
   const stickers = useAlbumStore((s) => s.stickers)
+  const token = useToken()
   const setStatus = useAlbumStore((s) => s.setStatus)
   const setDuplicateCount = useAlbumStore((s) => s.setDuplicateCount)
   const markAll = useAlbumStore((s) => s.markAll)
@@ -30,7 +32,7 @@ export function TeamView({ teamCode }: TeamViewProps) {
   const pct = Math.round((ownedCount / 20) * 100)
 
   function handleClick(id: string) {
-    setStatus(id, nextStatus(stickers[id]?.status ?? 'missing'))
+    setStatus(id, nextStatus(stickers[id]?.status ?? 'missing'), token ?? undefined)
   }
 
   return (
@@ -63,8 +65,8 @@ export function TeamView({ teamCode }: TeamViewProps) {
             <text x="40" y="49" textAnchor="middle" fill="var(--text-muted)" fontSize="7" fontFamily="Inter">de 20</text>
           </svg>
           <div className={styles.headerActions}>
-            <button className={styles.actionBtn} onClick={() => markAll(ids, 'owned')}>✓ Marcar todas</button>
-            <button className={`${styles.actionBtn} ${styles.actionBtnDanger}`} onClick={() => markAll(ids, 'missing')}>✕ Limpar</button>
+            <button className={styles.actionBtn} onClick={() => markAll(ids, 'owned', token ?? undefined)}>✓ Marcar todas</button>
+            <button className={`${styles.actionBtn} ${styles.actionBtnDanger}`} onClick={() => markAll(ids, 'missing', token ?? undefined)}>✕ Limpar</button>
           </div>
         </div>
       </div>
@@ -105,7 +107,7 @@ export function TeamView({ teamCode }: TeamViewProps) {
                       className={styles.dupInput}
                       type="number" min={1} defaultValue={dupCount} autoFocus
                       onClick={(e) => e.stopPropagation()}
-                      onChange={(e) => { const n = parseInt(e.target.value); if (!isNaN(n) && n >= 1) setDuplicateCount(id, n) }}
+                      onChange={(e) => { const n = parseInt(e.target.value); if (!isNaN(n) && n >= 1) setDuplicateCount(id, n, token ?? undefined) }}
                       onBlur={() => setEditingDup(null)}
                     />
                   ) : <span>×{dupCount}</span>}

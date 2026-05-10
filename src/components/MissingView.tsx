@@ -1,10 +1,12 @@
 import { useAlbumStore } from '../store/albumStore'
 import { GROUPS, SPECIAL_STICKERS } from '../data/album'
 import { Flag } from './Flag'
+import { useToken } from '../hooks/useToken'
 import styles from './MissingView.module.css'
 
 export function MissingView() {
   const stickers = useAlbumStore((s) => s.stickers)
+  const token = useToken()
   const setStatus = useAlbumStore((s) => s.setStatus)
 
   const missingSpecial = SPECIAL_STICKERS.filter((id) => stickers[id]?.status === 'missing')
@@ -51,7 +53,7 @@ export function MissingView() {
           </div>
           <div className={styles.chips}>
             {missingSpecial.map((id) => (
-              <button key={id} className={`${styles.chip} ${styles.chipSpecial}`} onClick={() => setStatus(id, 'owned')}>
+              <button key={id} className={`${styles.chip} ${styles.chipSpecial}`} onClick={() => setStatus(id, 'owned', token ?? undefined)}>
                 <span className={styles.chipId}>{id}</span>
                 <span className={styles.chipPlus}>+</span>
               </button>
@@ -75,7 +77,7 @@ export function MissingView() {
               <button
                 key={id}
                 className={styles.chip}
-                onClick={() => setStatus(id, 'owned')}
+                onClick={() => setStatus(id, 'owned', token ?? undefined)}
                 style={{ '--chip-color': team.color } as React.CSSProperties}
               >
                 <span className={styles.chipId}>{id}</span>

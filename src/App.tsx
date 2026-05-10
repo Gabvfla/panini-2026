@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useAlbumStore } from './store/albumStore'
+import { useAuthStore } from './store/authStore'
 import { Sidebar } from './components/Sidebar'
 import { MobileNav } from './components/MobileNav'
 import { Dashboard } from './components/Dashboard'
@@ -10,26 +11,43 @@ import { DuplicatesView } from './components/DuplicatesView'
 import { GroupsView } from './components/GroupsView'
 import { ExportModal } from './components/ExportModal'
 import { BatchInput } from './components/BatchInput'
+import { AuthScreen } from './components/AuthScreen'
 import styles from './App.module.css'
 
 export default function App() {
   const load = useAlbumStore((s) => s.load)
   const loaded = useAlbumStore((s) => s.loaded)
+  const syncing = useAlbumStore((s) => s.syncing)
+
+  const { user, token, restoreSession, logout } = useAuthStore()
+
   const [activeView, setActiveView] = useState('dashboard')
   const [showExport, setShowExport] = useState(false)
   const [showBatch, setShowBatch] = useState(false)
 
   useEffect(() => {
-    load()
-  }, [load])
+    restoreSession()
+  }, [restoreSession])
+
+  useEffect(() => {
+    if (token !== undefined) {
+      load(token ?? undefined)
+    }
+  }, [token, load])
 
   if (!loaded) {
     return (
       <div className={styles.loading}>
         <div className={styles.loadingIcon}>⚽</div>
-        <div className={styles.loadingText}>Carregando álbum...</div>
+        <div className={styles.loadingText}>
+          {syncing ? 'Sincronizando álbum...' : 'Carregando álbum...'}
+        </div>
       </div>
     )
+  }
+
+  if (!user) {
+    return <AuthScreen />
   }
 
   function renderContent() {
@@ -38,9 +56,7 @@ export default function App() {
     if (activeView === 'missing') return <MissingView />
     if (activeView === 'duplicates') return <DuplicatesView />
     if (activeView === 'groups') return <GroupsView onSelectTeam={(code) => setActiveView(`team-${code}`)} />
-    if (activeView.startsWith('team-')) {
-      return <TeamView teamCode={activeView.replace('team-', '')} />
-    }
+    if (activeView.startsWith('team-')) return <TeamView teamCode={activeView.replace('team-', '')} />
     return <Dashboard onExport={() => setShowExport(true)} />
   }
 
@@ -51,6 +67,8 @@ export default function App() {
         onNavigate={setActiveView}
         onExport={() => setShowExport(true)}
         onBatch={() => setShowBatch(true)}
+        userEmail={user.email}
+        onLogout={logout}
       />
       <main className={styles.main}>
         <div className={styles.content}>{renderContent()}</div>

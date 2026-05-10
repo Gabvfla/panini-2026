@@ -1,10 +1,12 @@
 import { useAlbumStore } from '../store/albumStore'
 import { GROUPS, SPECIAL_STICKERS } from '../data/album'
 import { Flag } from './Flag'
+import { useToken } from '../hooks/useToken'
 import styles from './DuplicatesView.module.css'
 
 export function DuplicatesView() {
   const stickers = useAlbumStore((s) => s.stickers)
+  const token = useToken()
   const setStatus = useAlbumStore((s) => s.setStatus)
   const setDuplicateCount = useAlbumStore((s) => s.setDuplicateCount)
 
@@ -27,8 +29,8 @@ export function DuplicatesView() {
   function adjust(id: string, delta: number) {
     const current = stickers[id]?.duplicateCount ?? 1
     const next = current + delta
-    if (next <= 0) setStatus(id, 'owned')
-    else setDuplicateCount(id, next)
+    if (next <= 0) setStatus(id, 'owned', token ?? undefined)
+    else setDuplicateCount(id, next, token ?? undefined)
   }
 
   function renderChip(id: string) {
