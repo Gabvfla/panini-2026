@@ -71,7 +71,6 @@ function parseInput(raw: string): ParsedToken[] {
 export function BatchInput({ onClose }: BatchInputProps) {
   const setDuplicateCount = useAlbumStore((s) => s.setDuplicateCount)
   const setStatus = useAlbumStore((s) => s.setStatus)
-  const markAll = useAlbumStore((s) => s.markAll)
   const stickers = useAlbumStore((s) => s.stickers)
   const [inputValue, setInputValue] = useState('')
   const [status, setStatus2] = useState<StickerStatus>('owned')

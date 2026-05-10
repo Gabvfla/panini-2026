@@ -1,4 +1,3 @@
-import { GROUPS } from '../data/album'
 import { useAlbumStore } from '../store/albumStore'
 import styles from './MobileNav.module.css'
 
