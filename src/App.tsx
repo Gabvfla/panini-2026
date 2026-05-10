@@ -18,8 +18,9 @@ export default function App() {
   const load = useAlbumStore((s) => s.load)
   const loaded = useAlbumStore((s) => s.loaded)
   const syncing = useAlbumStore((s) => s.syncing)
+  const resetLoaded = useAlbumStore((s) => s.resetLoaded)
 
-  const { user, token, restoreSession, logout } = useAuthStore()
+  const { user, token, restoreSession, logout, sessionChecked } = useAuthStore()
 
   const [activeView, setActiveView] = useState('dashboard')
   const [showExport, setShowExport] = useState(false)
@@ -30,17 +31,21 @@ export default function App() {
   }, [restoreSession])
 
   useEffect(() => {
-    if (token !== undefined) {
-      load(token ?? undefined)
-    }
-  }, [token, load])
+    if (!sessionChecked) return
+    load(token ?? undefined)
+  }, [sessionChecked, token, load])
 
-  if (!loaded) {
+  async function handleLogout() {
+    resetLoaded()
+    await logout()
+  }
+
+  if (!sessionChecked || !loaded) {
     return (
       <div className={styles.loading}>
         <div className={styles.loadingIcon}>⚽</div>
         <div className={styles.loadingText}>
-          {syncing ? 'Sincronizando álbum...' : 'Carregando álbum...'}
+          {syncing ? 'Sincronizando álbum...' : 'Carregando...'}
         </div>
       </div>
     )
@@ -68,7 +73,7 @@ export default function App() {
         onExport={() => setShowExport(true)}
         onBatch={() => setShowBatch(true)}
         userEmail={user.email}
-        onLogout={logout}
+        onLogout={handleLogout}
       />
       <main className={styles.main}>
         <div className={styles.content}>{renderContent()}</div>

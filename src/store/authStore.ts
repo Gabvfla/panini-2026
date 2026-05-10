@@ -6,6 +6,7 @@ interface AuthStore {
   token: string | null
   loading: boolean
   error: string | null
+  sessionChecked: boolean
   login: (email: string, password: string) => Promise<void>
   register: (email: string, password: string) => Promise<void>
   logout: () => Promise<void>
@@ -28,16 +29,22 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   token: null,
   loading: false,
   error: null,
+  sessionChecked: false,
 
   restoreSession: () => {
     try {
       const raw = localStorage.getItem(SESSION_KEY)
-      if (!raw) return
-      const { token, user } = JSON.parse(raw)
-      if (token && user) set({ token, user })
+      if (raw) {
+        const { token, user } = JSON.parse(raw)
+        if (token && user) {
+          set({ token, user, sessionChecked: true })
+          return
+        }
+      }
     } catch {
       clearSession()
     }
+    set({ sessionChecked: true })
   },
 
   login: async (email, password) => {
@@ -45,7 +52,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     try {
       const session = await signIn(email, password)
       persistSession(session)
-      set({ user: session.user, token: session.access_token, loading: false })
+      set({ user: session.user, token: session.access_token, loading: false, sessionChecked: true })
     } catch (e) {
       set({ error: (e as Error).message, loading: false })
     }
@@ -56,7 +63,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     try {
       const session = await signUp(email, password)
       persistSession(session)
-      set({ user: session.user, token: session.access_token, loading: false })
+      set({ user: session.user, token: session.access_token, loading: false, sessionChecked: true })
     } catch (e) {
       set({ error: (e as Error).message, loading: false })
     }
@@ -71,7 +78,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       /* ignore */
     } finally {
       clearSession()
-      set({ user: null, token: null, loading: false, error: null })
+      set({ user: null, token: null, loading: false, error: null, sessionChecked: true })
     }
   },
 

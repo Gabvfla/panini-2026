@@ -7,6 +7,7 @@ interface AlbumStore {
   stickers: Record<string, Sticker>
   loaded: boolean
   syncing: boolean
+  resetLoaded: () => void
   load: (token?: string) => Promise<void>
   save: (token?: string) => Promise<void>
   setStatus: (id: string, status: StickerStatus, token?: string) => void
@@ -58,6 +59,9 @@ export const useAlbumStore = create<AlbumStore>((set, get) => ({
   stickers: buildInitialStickers(),
   loaded: false,
   syncing: false,
+
+  resetLoaded: () => set({ loaded: false, stickers: buildInitialStickers() }),
+
 
   load: async (token?: string) => {
     const initial = buildInitialStickers()
