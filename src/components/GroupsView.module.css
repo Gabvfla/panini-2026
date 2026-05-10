@@ -1,0 +1,86 @@
+.container {
+  padding: 24px 20px 120px;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 28px;
+  letter-spacing: 3px;
+  color: var(--gold);
+  margin-bottom: 20px;
+}
+
+.group {
+  margin-bottom: 16px;
+}
+
+.groupLabel {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  padding-left: 4px;
+}
+
+.teams {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.teamBtn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  width: 100%;
+  text-align: left;
+  transition: all var(--transition);
+}
+
+.teamBtn:hover, .teamBtn:active {
+  border-color: var(--border-light);
+  background: var(--bg-hover);
+}
+
+.teamInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.teamName {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.teamBar {
+  height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.teamFill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.4s ease;
+  opacity: 0.8;
+}
+
+.teamCount {
+  font-size: 12px;
+  font-weight: 700;
+  min-width: 36px;
+  text-align: right;
+  flex-shrink: 0;
+}

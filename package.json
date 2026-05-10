@@ -14,15 +14,27 @@
     "preview": "vite preview",
     "electron:dev": "concurrently \"cross-env NODE_ENV=development vite\" \"wait-on http://localhost:5173 && cross-env NODE_ENV=development electron .\"",
     "electron:build": "npm run build && electron-builder",
-    "electron:preview": "electron ."
+    "electron:preview": "electron .",
+    "build:pwa": "tsc -b && vite build --mode pwa"
   },
   "build": {
     "appId": "com.panini2026.album",
-    "directories": { "output": "release" },
-    "files": ["dist/**/*", "electron/**/*"],
-    "mac": { "target": "dmg" },
-    "win": { "target": "nsis" },
-    "linux": { "target": "AppImage" }
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*"
+    ],
+    "mac": {
+      "target": "dmg"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
   },
   "dependencies": {
     "react": "^19.2.5",
