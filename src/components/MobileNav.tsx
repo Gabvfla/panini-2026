@@ -15,60 +15,76 @@ export function MobileNav({ activeView, onNavigate, onExport, onBatch }: MobileN
   const unsaved = useAlbumStore((s) => s.unsaved)
   const stats = getStats()
 
-  const mainItems = [
+  const isTeamView = activeView.startsWith('team-')
+
+  const navItems = [
     { id: 'dashboard', icon: '◈', label: 'Geral' },
     { id: 'missing', icon: '◻', label: 'Faltando' },
     { id: 'duplicates', icon: '⧉', label: 'Repetidas' },
     { id: 'special', icon: '★', label: 'Especiais' },
+    { id: 'groups', icon: '🏟', label: 'Grupos' },
   ]
-
-  const isTeamView = activeView.startsWith('team-')
 
   return (
     <div className={styles.wrapper}>
+
+      {unsaved && (
+        <button
+          className={styles.saveBanner}
+          onClick={saveAll}
+          disabled={saving}
+        >
+          {saving ? (
+            <><span className={styles.spinner} /> Salvando...</>
+          ) : (
+            <>💾 Salvar alterações no álbum</>
+          )}
+        </button>
+      )}
+
       <div className={styles.statsBar}>
         <div className={styles.stat}>
           <span className={styles.statNum} style={{ color: 'var(--green)' }}>{stats.owned}</span>
           <span className={styles.statLbl}>tenho</span>
         </div>
+        <div className={styles.statDivider} />
         <div className={styles.stat}>
           <span className={styles.statNum} style={{ color: 'var(--red)' }}>{stats.missing}</span>
           <span className={styles.statLbl}>faltam</span>
         </div>
+        <div className={styles.statDivider} />
         <div className={styles.stat}>
           <span className={styles.statNum} style={{ color: 'var(--yellow)' }}>{stats.duplicates}</span>
           <span className={styles.statLbl}>rep.</span>
         </div>
+        <div className={styles.statDivider} />
         <div className={styles.stat}>
           <span className={styles.statNum} style={{ color: 'var(--gold)' }}>{stats.completion}%</span>
           <span className={styles.statLbl}>completo</span>
         </div>
-        <button className={styles.batchBtn} onClick={onBatch}>⚡</button>
-        <button className={styles.exportBtn} onClick={onExport}>📤</button>
-        {unsaved && (
-          <button className={styles.saveFloatBtn} onClick={saveAll} disabled={saving} title={saving ? 'Salvando...' : 'Salvar alterações'}>
-            {saving ? '⏳' : '💾'}
-          </button>
-        )}
       </div>
 
       <nav className={styles.nav}>
-        {mainItems.map((item) => (
-          <button
-            key={item.id}
-            className={`${styles.navBtn} ${activeView === item.id ? styles.navActive : ''}`}
-            onClick={() => onNavigate(item.id)}
-          >
-            <span className={styles.navIcon}>{item.icon}</span>
-            <span className={styles.navLabel}>{item.label}</span>
-          </button>
-        ))}
-        <button
-          className={`${styles.navBtn} ${isTeamView ? styles.navActive : ''}`}
-          onClick={() => onNavigate('groups')}
-        >
-          <span className={styles.navIcon}>🏟</span>
-          <span className={styles.navLabel}>Grupos</span>
+        {navItems.map((item) => {
+          const isActive = item.id === 'groups' ? isTeamView || activeView === 'groups' : activeView === item.id
+          return (
+            <button
+              key={item.id}
+              className={`${styles.navBtn} ${isActive ? styles.navActive : ''}`}
+              onClick={() => onNavigate(item.id)}
+            >
+              <span className={styles.navIcon}>{item.icon}</span>
+              <span className={styles.navLabel}>{item.label}</span>
+            </button>
+          )
+        })}
+        <button className={styles.navBtn} onClick={onBatch}>
+          <span className={styles.navIcon}>⚡</span>
+          <span className={styles.navLabel}>Lote</span>
+        </button>
+        <button className={styles.navBtn} onClick={onExport}>
+          <span className={styles.navIcon}>📤</span>
+          <span className={styles.navLabel}>Export</span>
         </button>
       </nav>
     </div>
