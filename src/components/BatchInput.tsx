@@ -102,7 +102,7 @@ export function BatchInput({ onClose }: BatchInputProps) {
     setApplied(true)
     setInputValue('')
     setTimeout(() => setApplied(false), 2500)
-  }, [valid, status, stickers, setDuplicateCount, setStatus, tokenAuth])
+  }, [valid, status, stickers, setDuplicateCount, setStatus])
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) handleApply()
