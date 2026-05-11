@@ -15,6 +15,9 @@ interface SidebarProps {
 export function Sidebar({ activeView, onNavigate, onExport, onBatch, userEmail, onLogout }: SidebarProps) {
   const stickers = useAlbumStore((s) => s.stickers)
   const getStats = useAlbumStore((s) => s.getStats)
+  const saveAll = useAlbumStore((s) => s.saveAll)
+  const saving = useAlbumStore((s) => s.saving)
+  const unsaved = useAlbumStore((s) => s.unsaved)
   const stats = getStats()
 
   function getTeamOwned(teamCode: string) {
@@ -103,6 +106,13 @@ export function Sidebar({ activeView, onNavigate, onExport, onBatch, userEmail, 
           </div>
         ))}
       </div>
+      {unsaved && (
+        <div className={styles.saveBar}>
+          <button className={styles.saveBtn} onClick={saveAll} disabled={saving}>
+            {saving ? '⏳ Salvando...' : '💾 Salvar alterações'}
+          </button>
+        </div>
+      )}
       <div className={styles.userBar}>
         <div className={styles.userEmail}>{userEmail}</div>
         <button className={styles.logoutBtn} onClick={onLogout} title="Sair">↩ Sair</button>

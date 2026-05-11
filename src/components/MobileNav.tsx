@@ -10,6 +10,9 @@ interface MobileNavProps {
 
 export function MobileNav({ activeView, onNavigate, onExport, onBatch }: MobileNavProps) {
   const getStats = useAlbumStore((s) => s.getStats)
+  const saveAll = useAlbumStore((s) => s.saveAll)
+  const saving = useAlbumStore((s) => s.saving)
+  const unsaved = useAlbumStore((s) => s.unsaved)
   const stats = getStats()
 
   const mainItems = [
@@ -42,6 +45,11 @@ export function MobileNav({ activeView, onNavigate, onExport, onBatch }: MobileN
         </div>
         <button className={styles.batchBtn} onClick={onBatch}>⚡</button>
         <button className={styles.exportBtn} onClick={onExport}>📤</button>
+        {unsaved && (
+          <button className={styles.saveFloatBtn} onClick={saveAll} disabled={saving} title={saving ? 'Salvando...' : 'Salvar alterações'}>
+            {saving ? '⏳' : '💾'}
+          </button>
+        )}
       </div>
 
       <nav className={styles.nav}>

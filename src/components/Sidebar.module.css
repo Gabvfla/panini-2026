@@ -292,3 +292,32 @@
   color: var(--red);
   border-color: var(--red-dim);
 }
+
+.saveBar {
+  padding: 8px 12px;
+  border-top: 1px solid var(--border);
+}
+
+.saveBtn {
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--green-bg);
+  border: 1px solid var(--green-dim);
+  color: var(--green);
+  transition: all var(--transition);
+  cursor: pointer;
+  letter-spacing: 0.3px;
+}
+
+.saveBtn:hover:not(:disabled) {
+  background: var(--green-dim);
+  color: #fff;
+}
+
+.saveBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
