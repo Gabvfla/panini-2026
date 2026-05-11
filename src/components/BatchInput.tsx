@@ -3,7 +3,6 @@ import { useAlbumStore } from '../store/albumStore'
 import { ALL_STICKER_IDS, TEAM_MAP, SPECIAL_STICKERS } from '../data/album'
 import { Flag } from './Flag'
 import type { StickerStatus } from '../types'
-import { useToken } from '../hooks/useToken'
 import styles from './BatchInput.module.css'
 
 interface BatchInputProps {
@@ -71,7 +70,6 @@ function parseInput(raw: string): ParsedToken[] {
 
 export function BatchInput({ onClose }: BatchInputProps) {
   const setDuplicateCount = useAlbumStore((s) => s.setDuplicateCount)
-  const tokenAuth = useToken()
   const setStatus = useAlbumStore((s) => s.setStatus)
   const stickers = useAlbumStore((s) => s.stickers)
   const [inputValue, setInputValue] = useState('')
@@ -94,9 +92,9 @@ export function BatchInput({ onClose }: BatchInputProps) {
       if (token.count > 1) {
         const existing = stickers[token.id]?.duplicateCount ?? 0
         const newCount = existing > 0 ? existing + token.count : token.count
-        setDuplicateCount(token.id, newCount, tokenAuth ?? undefined)
+        setDuplicateCount(token.id, newCount)
       } else {
-        setStatus(token.id, status, tokenAuth ?? undefined)
+        setStatus(token.id, status)
       }
     }
 

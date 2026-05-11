@@ -8,12 +8,11 @@ interface AlbumStore {
   loaded: boolean
   syncing: boolean
   resetLoaded: () => void
-  load: (token?: string) => Promise<void>
-  save: (token?: string) => Promise<void>
-  setStatus: (id: string, status: StickerStatus, token?: string) => void
-  setDuplicateCount: (id: string, count: number, token?: string) => void
-  markAll: (ids: string[], status: StickerStatus, token?: string) => void
-  reset: (token?: string) => void
+  load: (token?: string | null) => Promise<void>
+  setStatus: (id: string, status: StickerStatus) => void
+  setDuplicateCount: (id: string, count: number) => void
+  markAll: (ids: string[], status: StickerStatus) => void
+  reset: () => void
   getStats: () => {
     total: number
     owned: number
@@ -25,10 +24,7 @@ interface AlbumStore {
 
 function buildInitialStickers(): Record<string, Sticker> {
   return Object.fromEntries(
-    ALL_STICKER_IDS.map((id) => [
-      id,
-      { id, status: 'missing' as StickerStatus, duplicateCount: 0 },
-    ])
+    ALL_STICKER_IDS.map((id) => [id, { id, status: 'missing' as StickerStatus, duplicateCount: 0 }])
   )
 }
 
@@ -41,18 +37,23 @@ declare global {
   }
 }
 
-function mergeFromRemote(initial: Record<string, Sticker>, rows: { sticker_id: string; status: string; duplicate_count: number }[]): Record<string, Sticker> {
-  const merged = { ...initial }
-  for (const row of rows) {
-    if (merged[row.sticker_id]) {
-      merged[row.sticker_id] = {
-        id: row.sticker_id,
-        status: row.status as StickerStatus,
-        duplicateCount: row.duplicate_count,
-      }
-    }
+function getToken(): string | null {
+  try {
+    const raw = localStorage.getItem('panini-session')
+    if (!raw) return null
+    return JSON.parse(raw).token ?? null
+  } catch {
+    return null
   }
-  return merged
+}
+
+function saveLocal(stickers: Record<string, Sticker>) {
+  const data: AlbumData = { stickers, lastUpdated: new Date().toISOString() }
+  if (window.electronAPI) {
+    window.electronAPI.saveData(data)
+  } else {
+    localStorage.setItem('panini-2026', JSON.stringify(data))
+  }
 }
 
 export const useAlbumStore = create<AlbumStore>((set, get) => ({
@@ -62,18 +63,27 @@ export const useAlbumStore = create<AlbumStore>((set, get) => ({
 
   resetLoaded: () => set({ loaded: false, stickers: buildInitialStickers() }),
 
-
-  load: async (token?: string) => {
+  load: async (token) => {
     const initial = buildInitialStickers()
 
     if (token) {
       set({ syncing: true })
       try {
         const rows = await loadStickers(token)
-        const merged = mergeFromRemote(initial, rows)
+        const merged = { ...initial }
+        for (const row of rows) {
+          if (merged[row.sticker_id]) {
+            merged[row.sticker_id] = {
+              id: row.sticker_id,
+              status: row.status as StickerStatus,
+              duplicateCount: row.duplicate_count,
+            }
+          }
+        }
         set({ stickers: merged, loaded: true, syncing: false })
         return
-      } catch {
+      } catch (e) {
+        console.error('load from supabase failed:', e)
         set({ syncing: false })
       }
     }
@@ -106,69 +116,52 @@ export const useAlbumStore = create<AlbumStore>((set, get) => ({
     set({ stickers: initial, loaded: true })
   },
 
-  save: async (token?: string) => {
-    const { stickers } = get()
-    if (token) {
-      const rows = Object.values(stickers)
-        .filter((s) => s.status !== 'missing')
-        .map((s) => ({ sticker_id: s.id, status: s.status, duplicate_count: s.duplicateCount }))
-      await upsertAllStickers(token, rows)
-      return
-    }
-    const data: AlbumData = { stickers, lastUpdated: new Date().toISOString() }
-    if (window.electronAPI) {
-      await window.electronAPI.saveData(data)
-    } else {
-      localStorage.setItem('panini-2026', JSON.stringify(data))
-    }
-  },
-
-  setStatus: (id, status, token) => {
+  setStatus: (id, status) => {
+    const dupCount = status === 'duplicate'
+      ? (get().stickers[id]?.duplicateCount || 1)
+      : 0
     set((state) => ({
       stickers: {
         ...state.stickers,
-        [id]: {
-          ...state.stickers[id],
-          status,
-          duplicateCount: status !== 'duplicate' ? 0 : state.stickers[id].duplicateCount || 1,
-        },
+        [id]: { ...state.stickers[id], status, duplicateCount: dupCount },
       },
     }))
-    const { stickers } = get()
-    const s = stickers[id]
+    const token = getToken()
     if (token) {
-      upsertSticker(token, { sticker_id: id, status, duplicate_count: s.duplicateCount })
+      upsertSticker(token, { sticker_id: id, status, duplicate_count: dupCount })
     } else {
-      get().save()
+      saveLocal(get().stickers)
     }
   },
 
-  setDuplicateCount: (id, count, token) => {
+  setDuplicateCount: (id, count) => {
     set((state) => ({
       stickers: {
         ...state.stickers,
         [id]: { ...state.stickers[id], status: 'duplicate', duplicateCount: count },
       },
     }))
+    const token = getToken()
     if (token) {
       upsertSticker(token, { sticker_id: id, status: 'duplicate', duplicate_count: count })
     } else {
-      get().save()
+      saveLocal(get().stickers)
     }
   },
 
-  markAll: (ids, status, token) => {
+  markAll: (ids, status) => {
     set((state) => {
       const updated = { ...state.stickers }
       for (const id of ids) {
         updated[id] = {
           ...updated[id],
           status,
-          duplicateCount: status !== 'duplicate' ? 0 : updated[id].duplicateCount || 1,
+          duplicateCount: status === 'duplicate' ? (updated[id].duplicateCount || 1) : 0,
         }
       }
       return { stickers: updated }
     })
+    const token = getToken()
     if (token) {
       const { stickers } = get()
       const rows = ids.map((id) => ({
@@ -178,21 +171,14 @@ export const useAlbumStore = create<AlbumStore>((set, get) => ({
       }))
       upsertAllStickers(token, rows)
     } else {
-      get().save()
+      saveLocal(get().stickers)
     }
   },
 
-  reset: (token) => {
+  reset: () => {
     const fresh = buildInitialStickers()
     set({ stickers: fresh })
-    if (!token) {
-      const data: AlbumData = { stickers: fresh, lastUpdated: new Date().toISOString() }
-      if (window.electronAPI) {
-        window.electronAPI.saveData(data)
-      } else {
-        localStorage.setItem('panini-2026', JSON.stringify(data))
-      }
-    }
+    saveLocal(fresh)
   },
 
   getStats: () => {

@@ -1,7 +1,6 @@
 import { useAlbumStore } from '../store/albumStore'
 import { SPECIAL_STICKERS } from '../data/album'
 import type { StickerStatus } from '../types'
-import { useToken } from '../hooks/useToken'
 import styles from './SpecialView.module.css'
 
 const STATUS_CYCLE: StickerStatus[] = ['missing', 'owned', 'duplicate']
@@ -12,7 +11,6 @@ function nextStatus(current: StickerStatus): StickerStatus {
 
 export function SpecialView() {
   const stickers = useAlbumStore((s) => s.stickers)
-  const token = useToken()
   const setStatus = useAlbumStore((s) => s.setStatus)
   const markAll = useAlbumStore((s) => s.markAll)
 
@@ -54,8 +52,8 @@ export function SpecialView() {
             </svg>
           </div>
           <div className={styles.actions}>
-            <button className={styles.btn} onClick={() => markAll(SPECIAL_STICKERS, 'owned', token ?? undefined)}>✓ Marcar todas</button>
-            <button className={`${styles.btn} ${styles.btnDanger}`} onClick={() => markAll(SPECIAL_STICKERS, 'missing', token ?? undefined)}>✕ Limpar</button>
+            <button className={styles.btn} onClick={() => markAll(SPECIAL_STICKERS, 'owned')}>✓ Marcar todas</button>
+            <button className={`${styles.btn} ${styles.btnDanger}`} onClick={() => markAll(SPECIAL_STICKERS, 'missing')}>✕ Limpar</button>
           </div>
         </div>
       </div>
@@ -68,7 +66,7 @@ export function SpecialView() {
             <div
               key={id}
               className={`${styles.card} ${styles[`card_${status}`]} ${isSpecial ? styles.cardSpecial : ''}`}
-              onClick={() => setStatus(id, nextStatus(status), token ?? undefined)}
+              onClick={() => setStatus(id, nextStatus(status))}
             >
               <div className={styles.cardShine} />
               <div className={styles.cardStar}>{isSpecial ? '⚽' : '★'}</div>
