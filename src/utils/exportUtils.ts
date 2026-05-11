@@ -96,7 +96,7 @@ export function generateCSV(stickers: Record<string, Sticker>): string {
 }
 
 export function downloadBlob(data: Uint8Array | string, filename: string, mimeType: string) {
-  const blobData: BlobPart = data instanceof Uint8Array ? new Blob() : data
+  const blobData: BlobPart = data instanceof Uint8Array ? new Blob([data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength)]) : data
   const blob = new Blob([blobData], { type: mimeType })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')

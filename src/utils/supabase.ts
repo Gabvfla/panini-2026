@@ -69,3 +69,19 @@ export async function saveSingleSticker(token: string, userId: string, row: Stic
   const res = await fetch(`${SUPABASE_URL}/rest/v1/stickers`, { method: 'POST', headers: hdrs, body: JSON.stringify({ ...row, user_id: userId }) })
   if (!res.ok) console.error('saveSingleSticker error:', await res.text())
 }
+
+export async function deleteSingleSticker(token: string, stickerId: string): Promise<void> {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/stickers?sticker_id=eq.${stickerId}`, {
+    method: 'DELETE',
+    headers: headers(token),
+  })
+  if (!res.ok) console.error('deleteSingleSticker error:', await res.text())
+}
+
+export async function deleteAllStickers(token: string): Promise<void> {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/stickers?sticker_id=neq.___none___`, {
+    method: 'DELETE',
+    headers: headers(token),
+  })
+  if (!res.ok) console.error('deleteAllStickers error:', await res.text())
+}

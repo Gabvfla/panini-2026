@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { ALL_STICKER_IDS } from '../data/album'
 import type { AlbumData, Sticker, StickerStatus } from '../types'
-import { loadStickers, saveAllStickers, saveSingleSticker } from '../utils/supabase'
+import { loadStickers, saveAllStickers, saveSingleSticker, deleteSingleSticker, deleteAllStickers } from '../utils/supabase'
 
 interface AlbumStore {
   stickers: Record<string, Sticker>
@@ -63,13 +63,17 @@ export const useAlbumStore = create<AlbumStore>((set, get) => ({
         const merged = { ...initial }
         for (const row of rows) {
           if (merged[row.sticker_id]) {
-            merged[row.sticker_id] = { id: row.sticker_id, status: row.status as StickerStatus, duplicateCount: row.duplicate_count }
+            merged[row.sticker_id] = {
+              id: row.sticker_id,
+              status: row.status as StickerStatus,
+              duplicateCount: row.duplicate_count,
+            }
           }
         }
         set({ stickers: merged, loaded: true, syncing: false, unsaved: false })
         return
       } catch (e) {
-        console.error('load from supabase failed:', e)
+        console.error('load failed:', e)
         set({ syncing: false })
       }
     }
@@ -100,10 +104,15 @@ export const useAlbumStore = create<AlbumStore>((set, get) => ({
     set({ saving: true })
     try {
       if (session) {
-        const rows = Object.values(stickers)
-          .filter((s) => s.status !== 'missing')
-          .map((s) => ({ sticker_id: s.id, status: s.status, duplicate_count: s.duplicateCount }))
-        await saveAllStickers(session.token, session.userId, rows)
+        const toSave = Object.values(stickers).filter((s) => s.status !== 'missing')
+        await deleteAllStickers(session.token)
+        if (toSave.length > 0) {
+          await saveAllStickers(
+            session.token,
+            session.userId,
+            toSave.map((s) => ({ sticker_id: s.id, status: s.status, duplicate_count: s.duplicateCount }))
+          )
+        }
       } else {
         saveLocal(stickers)
       }
@@ -116,36 +125,69 @@ export const useAlbumStore = create<AlbumStore>((set, get) => ({
 
   setStatus: (id, status) => {
     const dupCount = status === 'duplicate' ? (get().stickers[id]?.duplicateCount || 1) : 0
-    set((state) => ({ stickers: { ...state.stickers, [id]: { ...state.stickers[id], status, duplicateCount: dupCount } }, unsaved: true }))
+    set((state) => ({
+      stickers: { ...state.stickers, [id]: { ...state.stickers[id], status, duplicateCount: dupCount } },
+      unsaved: true,
+    }))
     const session = getSession()
-    if (session) saveSingleSticker(session.token, session.userId, { sticker_id: id, status, duplicate_count: dupCount })
-    else saveLocal(get().stickers)
+    if (session) {
+      if (status === 'missing') {
+        deleteSingleSticker(session.token, id)
+      } else {
+        saveSingleSticker(session.token, session.userId, { sticker_id: id, status, duplicate_count: dupCount })
+      }
+    } else {
+      saveLocal(get().stickers)
+    }
   },
 
   setDuplicateCount: (id, count) => {
-    set((state) => ({ stickers: { ...state.stickers, [id]: { ...state.stickers[id], status: 'duplicate', duplicateCount: count } }, unsaved: true }))
+    set((state) => ({
+      stickers: { ...state.stickers, [id]: { ...state.stickers[id], status: 'duplicate', duplicateCount: count } },
+      unsaved: true,
+    }))
     const session = getSession()
-    if (session) saveSingleSticker(session.token, session.userId, { sticker_id: id, status: 'duplicate', duplicate_count: count })
-    else saveLocal(get().stickers)
+    if (session) {
+      saveSingleSticker(session.token, session.userId, { sticker_id: id, status: 'duplicate', duplicate_count: count })
+    } else {
+      saveLocal(get().stickers)
+    }
   },
 
   markAll: (ids, status) => {
     set((state) => {
       const updated = { ...state.stickers }
-      for (const id of ids) updated[id] = { ...updated[id], status, duplicateCount: status === 'duplicate' ? (updated[id].duplicateCount || 1) : 0 }
+      for (const id of ids) {
+        updated[id] = { ...updated[id], status, duplicateCount: status === 'duplicate' ? (updated[id].duplicateCount || 1) : 0 }
+      }
       return { stickers: updated, unsaved: true }
     })
     const session = getSession()
     if (session) {
       const { stickers } = get()
-      saveAllStickers(session.token, session.userId, ids.map((id) => ({ sticker_id: id, status, duplicate_count: stickers[id].duplicateCount })))
-    } else saveLocal(get().stickers)
+      if (status === 'missing') {
+        ids.forEach((id) => deleteSingleSticker(session.token, id))
+      } else {
+        saveAllStickers(
+          session.token,
+          session.userId,
+          ids.map((id) => ({ sticker_id: id, status, duplicate_count: stickers[id].duplicateCount }))
+        )
+      }
+    } else {
+      saveLocal(get().stickers)
+    }
   },
 
   reset: () => {
     const fresh = buildInitialStickers()
     set({ stickers: fresh, unsaved: false })
-    saveLocal(fresh)
+    const session = getSession()
+    if (session) {
+      deleteAllStickers(session.token)
+    } else {
+      saveLocal(fresh)
+    }
   },
 
   getStats: () => {
